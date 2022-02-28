@@ -22,6 +22,10 @@ else
   echo "\`/var/lib/kubelet\` already exists.  Will not be linking to $SNAP_COMMON"
 fi
 
+# Install the core addons
+snap_current=`echo "${SNAP}" | sed -e "s,${SNAP_REVISION},current,"`
+git clone "${snap_current}/addons/core" "${SNAP_COMMON}/addons/core"
+
 # Create the certificates
 mkdir ${SNAP_DATA}/certs
 # Allow the ability to add external IPs to the csr, by moving the csr.conf.template to SNAP_DATA
@@ -124,3 +128,10 @@ else
 fi
 mkdir -p "$SNAP_DATA/opt/cni/bin/"
 cp -R "$SNAP"/opt/cni/bin/* "$SNAP_DATA"/opt/cni/bin/
+
+# Low memory guard. Enable by default when system RAM is less than 512MB.
+MEMORY=`cat /proc/meminfo | grep MemTotal | awk '{ print $2 }'`
+if [ $MEMORY -le 524288 ]
+then
+  touch ${SNAP_DATA}/var/lock/low-memory-guard.lock
+fi

@@ -102,14 +102,22 @@ function store_kubernetes_info {
   sudo -E /snap/bin/microk8s kubectl get pvc 2>&1 | sudo tee $INSPECT_DUMP/k8s/get-pvc > /dev/null # 2>&1 redirects stderr and stdout to /dev/null if no resources found
 }
 
+function check_storage_addon {
+  image=`sudo -E /snap/bin/microk8s kubectl get deploy -n kube-system hostpath-provisioner -o jsonpath='{.spec.template.spec.containers[0].image}' 2>&1`
 
-function store_juju_info {
-  # Collect some juju details
-  printf -- '  Inspect Juju\n'
-  mkdir -p $INSPECT_DUMP/juju
-  sudo -E /snap/bin/microk8s juju status 2>&1 | sudo tee $INSPECT_DUMP/juju/status > /dev/null
-  sudo -E /snap/bin/microk8s juju debug-log 2>&1 | sudo tee $INSPECT_DUMP/juju/debug.log > /dev/null
-  sudo -E /snap/bin/microk8s kubectl logs -n controller-uk8s --tail 10000 -c api-server controller-0 2>&1 | sudo tee $INSPECT_DUMP/juju/controller.log > /dev/null
+  case "$image" in
+    cdkbot/hostpath-provisioner-amd64:1.0.0|cdkbot/hostpath-provisioner-arm64:1.0.0)
+      printf -- '\n'
+      printf -- '\033[0;33mWARNING: \033[0m You are using an outdated version of the hostpath-provisioner.\n'
+      printf -- 'Existing PersistentVolumes are not affected, but you may be unable to create new ones.\n'
+      printf -- "Image currently in use: ${image}\n"
+      printf -- '\n'
+      printf -- 'Consider updating the hostpath-provisioner with:\n'
+      printf -- '    microk8s disable hostpath-storage\n'
+      printf -- '    microk8s enable hostpath-storage\n'
+      printf -- '\n'
+      ;;
+  esac
 }
 
 
@@ -121,15 +129,6 @@ function store_dqlite_info {
   sudo -E cp ${SNAP_DATA}/var/kubernetes/backend/localnode.yaml $INSPECT_DUMP/dqlite/
   sudo -E cp ${SNAP_DATA}/var/kubernetes/backend/info.yaml $INSPECT_DUMP/dqlite/
   sudo -E ls -lh ${SNAP_DATA}/var/kubernetes/backend/ 2>&1 >  $INSPECT_DUMP/dqlite/list.out
-}
-
-
-function store_kubeflow_info {
-  # Collect some kubeflow details
-  printf -- '  Inspect Kubeflow\n'
-  mkdir -p $INSPECT_DUMP/kubeflow
-  sudo -E /snap/bin/microk8s kubectl get pods -nkubeflow -oyaml 2>&1 | sudo tee $INSPECT_DUMP/kubeflow/pods.yaml > /dev/null
-  sudo -E /snap/bin/microk8s kubectl describe pods -nkubeflow 2>&1 | sudo tee $INSPECT_DUMP/kubeflow/pods.describe > /dev/null
 }
 
 
@@ -277,7 +276,7 @@ function suggest_fixes {
   if grep Raspberry /proc/cpuinfo -q &&
     [ -e /etc/os-release ] &&
     grep impish /etc/os-release -q &&
-    ! dpkg -l | grep linux-modules-extra-raspi -q 
+    ! dpkg -l | grep linux-modules-extra-raspi -q
   then
     printf -- "\033[0;33mWARNING: \033[0m On Raspberry Pi consider installing the linux-modules-extra-raspi package with: \n"
     printf -- "\t  'sudo apt install linux-modules-extra-raspi' and reboot.\n"
@@ -326,6 +325,29 @@ function check_certificates {
   fi
 }
 
+function check_memory {
+  MEMORY=`cat /proc/meminfo | grep MemTotal | awk '{ print $2 }'`
+  if [ $MEMORY -le 524288 ]
+  then
+    printf -- "\033[0;33mWARNING: \033[0m This system has ${MEMORY} bytes of RAM available.\n"
+    printf -- "It may not be enough to run the Kubernetes control plane services.\n"
+    printf -- "Consider joining as a worker-only to a cluster.\n"
+  fi
+}
+
+function check_low_memory_guard {
+  if [ -e "${SNAP_DATA}/var/lock/low-memory-guard.lock" ]
+  then
+    printf -- '\033[0;33mWARNING: \033[0m The low memory guard is enabled.\n'
+    printf -- 'This is to protect the server from running out of memory.\n'
+    printf -- 'Consider joining as a worker-only to a cluster.\n'
+    printf -- '\n'
+    printf -- 'Alternatively, to disable the low memory guard, start MicroK8s with:\n'
+    printf -- '\n'
+    printf -- '    microk8s start --disable-low-memory-guard\n'
+  fi
+}
+
 
 if [ ${#@} -ne 0 ] && [ "$*" == "--help" ]; then
   print_help
@@ -334,6 +356,10 @@ fi;
 
 rm -rf ${SNAP_DATA}/inspection-report
 mkdir -p ${SNAP_DATA}/inspection-report
+
+printf -- 'Inspecting system\n'
+check_memory
+check_low_memory_guard
 
 printf -- 'Inspecting Certificates\n'
 check_certificates
@@ -378,12 +404,7 @@ store_network
 
 printf -- 'Inspecting kubernetes cluster\n'
 store_kubernetes_info
-
-printf -- 'Inspecting juju\n'
-store_juju_info
-
-printf -- 'Inspecting kubeflow\n'
-store_kubeflow_info
+check_storage_addon
 
 printf -- 'Inspecting dqlite\n'
 store_dqlite_info

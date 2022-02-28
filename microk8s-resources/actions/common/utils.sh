@@ -257,11 +257,11 @@ use_manifest() {
     else
         declare -A items
     fi
-    local tmp_manifest="${SNAP_USER_DATA}/tmp/temp.${manifest}"
+    local tmp_manifest="${SNAP_USER_DATA}/tmp/temp.yaml"
     items[\$ARCH]=$(arch)
 
     mkdir -p ${SNAP_USER_DATA}/tmp
-    cp "${SNAP}/actions/${manifest}" "${tmp_manifest}"
+    cp "${SNAP}/addons/core/addons/${manifest}" "${tmp_manifest}"
     for i in "${!items[@]}"
     do
         "$SNAP/bin/sed" -i 's@'$i'@'"${items[$i]}"'@g' "${tmp_manifest}"
@@ -347,7 +347,7 @@ wait_for_service_shutdown() {
 
 get_default_ip() {
     # Get the IP of the default interface
-    local DEFAULT_INTERFACE="$($SNAP/sbin/ip route show default | $SNAP/usr/bin/gawk '{for(i=1; i<NF; i++) if($i=="dev") print$(i+1)}')"
+    local DEFAULT_INTERFACE="$($SNAP/sbin/ip route show default | $SNAP/usr/bin/gawk '{for(i=1; i<NF; i++) if($i=="dev") print$(i+1)}' | head -1)"
     local IP_ADDR="$($SNAP/sbin/ip -o -4 addr list "$DEFAULT_INTERFACE" | $SNAP/usr/bin/gawk '{print $4}' | $SNAP/usr/bin/cut -d/ -f1 | head -1)"
     if [[ -z "$IP_ADDR" ]]
     then
@@ -761,3 +761,24 @@ then
     exit 1
   fi
 fi
+
+exit_if_low_memory_guard() {
+  if [ -e ${SNAP_DATA}/var/lock/low-memory-guard.lock ]
+  then
+    echo ''
+    echo 'This node does not have enough RAM to host the Kubernetes control plane services'
+    echo 'and join the database quorum. You may consider joining this node as a worker'
+    echo 'node to a cluster.'
+    echo ''
+    echo 'If you would still like to start the control plane services, start MicroK8s with:'
+    echo ''
+    echo '    microk8s start --disable-low-memory-guard'
+    echo ''
+    exit 1
+  fi
+}
+
+refresh_calico_if_needed() {
+    # Call the python script that does the calico update if needed
+    "$SNAP/usr/bin/python3" "$SNAP/scripts/calico/upgrade.py"
+}

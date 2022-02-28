@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	ClusterApiV1 = "/cluster/api/v1.0"
-	ClusterApiV2 = "/cluster/api/v2.0"
+	ClusterAPIV1 = "/cluster/api/v1.0"
+	ClusterAPIV2 = "/cluster/api/v2.0"
 )
 
 // NewServer creates a new *http.ServeMux and registers the MicroK8s cluster agent API endpoints.
@@ -30,7 +30,7 @@ func NewServer(timeout time.Duration) *http.ServeMux {
 	}))
 
 	// POST /v1/join
-	server.HandleFunc(fmt.Sprintf("%s/join", ClusterApiV1), withMiddleware(func(w http.ResponseWriter, r *http.Request) {
+	server.HandleFunc(fmt.Sprintf("%s/join", ClusterAPIV1), withMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusNotFound)
 			return
@@ -54,7 +54,7 @@ func NewServer(timeout time.Duration) *http.ServeMux {
 	}))
 
 	// POST v1/sign-cert
-	server.HandleFunc(fmt.Sprintf("%s/sign-cert", ClusterApiV1), withMiddleware(func(w http.ResponseWriter, r *http.Request) {
+	server.HandleFunc(fmt.Sprintf("%s/sign-cert", ClusterAPIV1), withMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusNotFound)
 			return
@@ -75,7 +75,7 @@ func NewServer(timeout time.Duration) *http.ServeMux {
 	}))
 
 	// POST v1/configure
-	server.HandleFunc(fmt.Sprintf("%s/configure", ClusterApiV1), withMiddleware(func(w http.ResponseWriter, r *http.Request) {
+	server.HandleFunc(fmt.Sprintf("%s/configure", ClusterAPIV1), withMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusNotFound)
 			return
@@ -95,7 +95,7 @@ func NewServer(timeout time.Duration) *http.ServeMux {
 	}))
 
 	// POST v1/upgrade
-	server.HandleFunc(fmt.Sprintf("%s/upgrade", ClusterApiV1), withMiddleware(func(w http.ResponseWriter, r *http.Request) {
+	server.HandleFunc(fmt.Sprintf("%s/upgrade", ClusterAPIV1), withMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusNotFound)
 			return
@@ -115,7 +115,7 @@ func NewServer(timeout time.Duration) *http.ServeMux {
 	}))
 
 	// POST v2/join
-	server.HandleFunc(fmt.Sprintf("%s/join", ClusterApiV2), withMiddleware(func(w http.ResponseWriter, r *http.Request) {
+	server.HandleFunc(fmt.Sprintf("%s/join", ClusterAPIV2), withMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusNotFound)
 			return

@@ -29,8 +29,8 @@ type JoinResponse struct {
 	// EtcdEndpoint is the endpoint where the etcd server is running, typically https://0.0.0.0:12379.
 	// Note that "0.0.0.0" in the response will be replaced with the IP used to join the new node.
 	EtcdEndpoint string `json:"etcd"`
-	// ApiServerPort is the port where the kube-apiserver is listening.
-	ApiServerPort string `json:"apiport"`
+	// APIServerPortis the port where the kube-apiserver is listening.
+	APIServerPortstring `json:"apiport"`
 	// KubeProxyToken is a token used to authenticate kube-proxy on the joining node.
 	KubeProxyToken string `json:"kubeproxy"`
 	// KubeletToken is a token used to authenticate kubelet on the joining node.

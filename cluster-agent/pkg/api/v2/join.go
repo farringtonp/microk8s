@@ -42,8 +42,8 @@ type JoinResponse struct {
 	CertificateAuthority string `json:"ca"`
 	// CallbackToken is a callback token used to authenticate requests with the cluster agent on the joining node.
 	CallbackToken string `json:"callback_token"`
-	// ApiServerPort is the port where the kube-apiserver is listening.
-	ApiServerPort string `json:"apiport"`
+	// APIServerPortis the port where the kube-apiserver is listening.
+	APIServerPortstring `json:"apiport"`
 	// KubeletArgs is a string with arguments for the kubelet service on the joining node.
 	KubeletArgs string `json:"kubelet_args"`
 	// HostNameOverride is the host name the joining node will be known as in the MicroK8s cluster.

@@ -36,7 +36,7 @@ type JoinRequest struct {
 	RemoteAddress string `json:"-"`
 }
 
-// JoinResponsee is the response message for the v2/join API endpoint.
+// JoinResponse is the response message for the v2/join API endpoint.
 type JoinResponse struct {
 	// CertificateAuthority is the root CertificateAuthority certificate for the Kubernetes cluster.
 	CertificateAuthority string `json:"ca"`

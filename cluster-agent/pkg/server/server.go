@@ -11,7 +11,9 @@ import (
 )
 
 const (
+	// ClusterAPIV1 is the version 1 of the MicroK8s cluster API.
 	ClusterAPIV1 = "/cluster/api/v1.0"
+	// ClusterAPIV2 is the version 2 of the MicroK8s cluster API.
 	ClusterAPIV2 = "/cluster/api/v2.0"
 )
 

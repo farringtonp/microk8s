@@ -30,5 +30,7 @@ jobs:
             grep -v "./microk8s-resources/actions/metallb.yaml" | \
             grep -v invalid.yaml | \
             grep -v calico)
-      - name: Check Go formatting
+      - name: Check Go formatting via golint
         uses: Jerome1337/golint-action@v1.0.2
+      - name: Check Go formatting via staticcheck
+        uses: dominikh/staticcheck-action@v1.0.0

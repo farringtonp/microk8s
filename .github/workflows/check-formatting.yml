@@ -32,9 +32,6 @@ jobs:
             grep -v calico)
       - name: Check Go formatting via golint
         uses: Jerome1337/golint-action@v1.0.2
-        with:
-          golint-path: ./cluster-agent
       - name: Check Go formatting via staticcheck
         uses: dominikh/staticcheck-action@v1.0.0
-        with:
-          path: ./cluster-agent
+        working-directory: ./cluster-agent

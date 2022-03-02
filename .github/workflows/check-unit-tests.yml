@@ -21,7 +21,7 @@ jobs:
 
       - name: Check Python unit tests
         run: |
-          tox -e unit
+          sudo tox -e unit
 
       - name: Install Go
         uses: actions/setup-go@v2

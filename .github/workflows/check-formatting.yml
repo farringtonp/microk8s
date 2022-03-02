@@ -54,7 +54,7 @@ jobs:
           (
             GOPATH=$(go env GOPATH)
             PATH=$PATH:$GOPATH/bin
-            go get -u github.com/golang/staticcheck/cmd/staticcheck
+            go install honnef.co/go/tools/cmd/staticcheck@latest
             cd cluster-agent
             staticcheck ./...
           )

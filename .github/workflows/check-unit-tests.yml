@@ -16,12 +16,10 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v2
 
-      - name: Install Tox
-        uses: paolorechia/pox@v1.0
-
       - name: Check Python unit tests
         run: |
-          sudo tox -e unit
+          python3 -m pip install tox
+          tox -e unit
 
       - name: Install Go
         uses: actions/setup-go@v2

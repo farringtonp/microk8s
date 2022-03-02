@@ -16,11 +16,9 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v2
 
-      - name: Install Tox
-        uses: paolorechia/pox@v1.0
-
       - name: Check Python linter
         run: |
+          python3 -m pip install tox
           tox -e lint
 
       - name: Install NPM
@@ -50,4 +48,3 @@ jobs:
           set -eux
           go get -u github.com/golang/staticcheck/cmd/staticcheck
           (cd cluster-agent && staticcheck ./...)
-

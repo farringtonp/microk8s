@@ -40,11 +40,21 @@ jobs:
       - name: Check Go linter
         run: |
           set -eux
-          go get -u golang.org/x/lint/golint
-          (cd cluster-agent && golint ./...)
+          (
+            GOPATH=$(go env GOPATH)
+            PATH=$PATH:$GOPATH/bin
+            go get -u golang.org/x/lint/golint
+            cd cluster-agent
+            golint ./...
+          )
 
       - name: Check Go staticcheck
         run: |
           set -eux
-          go get -u github.com/golang/staticcheck/cmd/staticcheck
-          (cd cluster-agent && staticcheck ./...)
+          (
+            GOPATH=$(go env GOPATH)
+            PATH=$PATH:$GOPATH/bin
+            go get -u github.com/golang/staticcheck/cmd/staticcheck
+            cd cluster-agent
+            staticcheck ./...
+          )

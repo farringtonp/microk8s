@@ -51,10 +51,8 @@ jobs:
       - name: Check Go staticcheck
         run: |
           set -eux
+          go install honnef.co/go/tools/cmd/staticcheck
           (
-            GOPATH=$(go env GOPATH)
-            PATH=$PATH:$GOPATH/bin
-            go install honnef.co/go/tools/cmd/staticcheck
             cd cluster-agent
             staticcheck ./...
           )

@@ -37,13 +37,21 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v2
 
+      - name: Check Go vet
+        run: |
+          set -eux
+          (
+            cd cluster-agent
+            go vet ./...
+          )
+
       - name: Check Go linter
         run: |
           set -eux
           (
             GOPATH=$(go env GOPATH)
             PATH=$PATH:$GOPATH/bin
-            go get -u golang.org/x/lint/golint
+            go install golang.org/x/lint/golint@latest
             cd cluster-agent
             golint ./...
           )
@@ -52,8 +60,10 @@ jobs:
         run: |
           set -eux
           unset GOPATH
-          go install honnef.co/go/tools/cmd/staticcheck@latest
           (
+            GOPATH=$(go env GOPATH)
+            PATH=$PATH:$GOPATH/bin
+            go install honnef.co/go/tools/cmd/staticcheck@latest
             cd cluster-agent
             staticcheck ./...
           )

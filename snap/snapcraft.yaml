@@ -617,10 +617,9 @@ parts:
       - PyYAML == 5.3.1
       - netifaces == 0.10.9
     stage-packages:
-      - python3-openssl
       - openssl
+      - python3-openssl
       - python3-requests
-      - gunicorn3
       - python3-click
       - python3-dateutil
 
